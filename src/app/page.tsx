@@ -12,13 +12,14 @@ export default function Home() {
     const selectedFile = e.target.files?.[0];
     if (selectedFile && selectedFile.size <= 50 * 1024 * 1024) {
       setFile(selectedFile);
+      setCustomName(`${selectedFile.name}`.split('.')[0])
     } else {
       alert('File must be under 50MB');
       e.target.value = '';
     }
   };
 
-  const handleUpload = () => {
+  const handleUpload = async () => {
     if (!file) {
       alert('Please select a file');
       return;
@@ -32,9 +33,13 @@ export default function Home() {
     console.log('Uploading:', file.name);
     console.log('Custom name:', customName);
 
-    uploadFile({file, customName});
+    var response = await uploadFile(file, customName);
 
-    alert(`File "${file.name}" uploaded as "${customName}"`);
+    if (response.success) {
+      alert(`File "${file.name}" uploaded as "${customName}"`);
+    }else{
+      alert(response.error);
+    }
   };
 
   return (
@@ -52,7 +57,7 @@ export default function Home() {
 
           <input
             type="file"
-            accept=".pdf,.txt,.zip,.jpg,.png,.js,.py"
+            accept="*"
             onChange={handleChange}
             className="file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-100 file:text-blue-700 hover:file:bg-blue-200 mt-2"
           />
