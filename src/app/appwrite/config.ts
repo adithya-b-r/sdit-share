@@ -47,3 +47,17 @@ export const uploadFile = async (file: File, fileName: string) => {
     return {success: false, error: `File Upload Error: ${err}`};
   }
 };
+
+export const fetchFiles = async () =>{
+  try{
+    const response = await databases.listDocuments(
+      config.databaseId,
+      config.uploadedFilesCollectionId
+    );
+
+    console.log(response);
+    return {success: true, data: response.documents};
+  }catch(err){
+    return {success: false, error: `File Fetch Error: ${err}`}
+  }
+}

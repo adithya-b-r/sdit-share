@@ -1,6 +1,8 @@
 'use client';
 
 import { Download, Share2, Eye } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { fetchFiles } from '../appwrite/config';
 
 const demoFiles = [
   {
@@ -20,7 +22,30 @@ const demoFiles = [
   },
 ];
 
+type UploadedFile = {
+  $id: string;
+  fileName: string;
+  fileURL: string;
+  timeStamp: string;
+};
+
 export default function ViewFiles() {
+  const [files, setFiles] = useState<UploadedFile[]>([]);
+
+  useEffect(() => {
+    const getFiles = async () => {
+      const res = await fetchFiles();
+
+      if (res.success && res.data) {
+        setFiles(res.data.map(({ $id, fileName, fileURL, timeStamp }) => ({ $id, fileName, fileURL, timeStamp })));
+      } else {
+        console.error(res.error);
+      }
+    }
+
+    getFiles();
+  }, []);
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-white to-blue-100 py-10 px-4">
       <div className="max-w-3xl mx-auto">
@@ -29,14 +54,14 @@ export default function ViewFiles() {
         </h1>
 
         <div className="flex flex-col gap-4">
-          {demoFiles.map((file) => (
-            <div key={file.id} className="bg-white shadow-md rounded-lg px-4 py-3 flex justify-between items-center hover:shadow-lg transition">
-              
-              <span className="font-medium text-gray-800">{file.name}</span>
+          {files.map((file) => (
+            <div key={file.$id} className="bg-white shadow-md rounded-lg px-4 py-3 flex justify-between items-center hover:shadow-lg transition">
+
+              <span className="font-medium text-gray-800">{file.fileName}</span>
 
               <div className="flex gap-4 items-center text-blue-600">
                 <a
-                  href={file.url}
+                  href={file.fileURL}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="hover:text-blue-800"
@@ -46,7 +71,7 @@ export default function ViewFiles() {
                 </a>
                 <button
                   onClick={() => {
-                    navigator.clipboard.writeText(file.url);
+                    navigator.clipboard.writeText(file.fileURL);
                     alert('Link copied to clipboard!');
                   }}
                   title="Share"
@@ -55,7 +80,7 @@ export default function ViewFiles() {
                   <Share2 className="w-5 h-5" />
                 </button>
                 <a
-                  href={file.url}
+                  href={file.fileURL}
                   download
                   className="hover:text-blue-800"
                   title="Download"

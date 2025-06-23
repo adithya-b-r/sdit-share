@@ -37,7 +37,7 @@ export default function Home() {
 
     if (response.success) {
       alert(`File "${file.name}" uploaded as "${customName}"`);
-    }else{
+    } else {
       alert(response.error);
     }
   };
