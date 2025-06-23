@@ -18,7 +18,7 @@ client
 const databases = new Databases(client);
 const storage = new Storage(client);
 
-export const uploadFile = async ({file, fileName}: { file: File; fileName: string }) => {
+export const uploadFile = async (file: File, fileName: string) => {
   try{
     const uploaded = await storage.createFile(
       config.storageId,

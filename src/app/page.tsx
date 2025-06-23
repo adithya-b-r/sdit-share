@@ -2,6 +2,7 @@
 
 import { UploadCloud, FileUp, FolderOpen, Pencil } from 'lucide-react';
 import { useState } from 'react';
+import { uploadFile } from './appwrite/config';
 
 export default function Home() {
   const [file, setFile] = useState<File | null>(null);
@@ -30,6 +31,8 @@ export default function Home() {
 
     console.log('Uploading:', file.name);
     console.log('Custom name:', customName);
+
+    uploadFile({file, customName});
 
     alert(`File "${file.name}" uploaded as "${customName}"`);
   };
