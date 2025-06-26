@@ -1,22 +1,27 @@
 'use client';
 
-import { UploadCloud, FileUp, FolderOpen, Pencil } from 'lucide-react';
-import { useState } from 'react';
+import { UploadCloud, FileUp, FolderOpen } from 'lucide-react';
+import { useRef, useState } from 'react';
 import { uploadFile } from './appwrite/config';
 
 export default function Home() {
   const [file, setFile] = useState<File | null>(null);
   const [customName, setCustomName] = useState<string>('');
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0];
     if (selectedFile && selectedFile.size <= 50 * 1024 * 1024) {
       setFile(selectedFile);
-      setCustomName(`${selectedFile.name}`.split('.')[0])
+      setCustomName(`${selectedFile.name}`.split('.')[0]);
     } else {
       alert('File must be under 50MB');
       e.target.value = '';
     }
+  };
+
+  const triggerFileInput = () => {
+    fileInputRef.current?.click();
   };
 
   const handleUpload = async () => {
@@ -33,7 +38,7 @@ export default function Home() {
     console.log('Uploading:', file.name);
     console.log('Custom name:', customName);
 
-    var response = await uploadFile(file, customName);
+    const response = await uploadFile(file, customName);
 
     if (response.success) {
       alert(`File "${file.name}" uploaded as "${customName}"`);
@@ -44,24 +49,27 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-100 to-blue-300 flex flex-col items-center relative">
-
-      <div className="bg-white w-full max-w-xl my-auto rounded-2xl shadow-xl p-8 flex flex-col items-center gap-6">
+      <div className="bg-white md:w-full max-w-xl w-[94%] my-auto rounded-2xl shadow-xl p-8 flex flex-col items-center gap-6">
         <div className="text-center">
           <h1 className="text-4xl font-extrabold text-blue-800">SDIT SHARE</h1>
           <p className="text-sm text-gray-500 mt-1">Upload and share files up to 50MB</p>
         </div>
 
-        <div className="w-full border-2 border-dashed border-blue-300 rounded-xl p-6 text-center flex flex-col items-center gap-3 bg-blue-50">
+        <input
+          type="file"
+          accept="*"
+          ref={fileInputRef}
+          onChange={handleChange}
+          hidden
+        />
+
+        {/* Below div will trigger file upload */}
+        <div
+          onClick={triggerFileInput}
+          className="cursor-pointer w-full border-2 border-dashed border-blue-300 rounded-xl p-6 text-center flex flex-col items-center gap-3 bg-blue-50 hover:bg-blue-100 transition"
+        >
           <FileUp className="w-10 h-10 text-blue-600" />
           <p className="text-gray-600 font-medium">Choose a file to upload</p>
-
-          <input
-            type="file"
-            accept="*"
-            onChange={handleChange}
-            className="file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-100 file:text-blue-700 hover:file:bg-blue-200 mt-2"
-          />
-
           {file && (
             <p className="text-sm text-gray-700 mt-2">
               <strong>Selected:</strong> {file.name}
