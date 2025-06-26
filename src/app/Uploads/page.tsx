@@ -37,7 +37,7 @@ export default function ViewFiles() {
       const res = await fetchFiles();
 
       if (res.success && res.data) {
-        setFiles(res.data.map(({ $id, fileName, fileURL, timeStamp }) => ({ $id, fileName, fileURL, timeStamp })));
+        setFiles(res.data.map(({ $id, fileName, fileURL, timeStamp }) => ({ $id, fileName, fileURL, timeStamp })).reverse());
       } else {
         console.error(res.error);
       }
