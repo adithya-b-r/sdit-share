@@ -1,25 +1,23 @@
-import { timeStamp } from 'console';
-import { Client, Query, Databases, Storage, ID } from "appwrite";
+import { Client, Databases, Storage, ID } from "appwrite";
 
 export const config = {
   endpoint: process.env.NEXT_PUBLIC_APPWRITE_ENDPOINT!,
   projectId: process.env.NEXT_PUBLIC_APPWRITE_PROJECT_ID!,
   databaseId: process.env.NEXT_PUBLIC_APPWRITE_DATABASE_ID!,
   storageId: process.env.NEXT_PUBLIC_APPWRITE_STORAGE_ID!,
-  uploadedFilesCollectionId: process.env.NEXT_PUBLIC_APPWRITE_UPLOADED_FILES_COLLECTION_ID!,
+  uploadedFilesCollectionId:
+    process.env.NEXT_PUBLIC_APPWRITE_UPLOADED_FILES_COLLECTION_ID!,
 };
 
 const client = new Client();
 
-client
-  .setEndpoint(config.endpoint)
-  .setProject(config.projectId);
+client.setEndpoint(config.endpoint).setProject(config.projectId);
 
 const databases = new Databases(client);
 const storage = new Storage(client);
 
 export const uploadFile = async (file: File, fileName: string) => {
-  try{
+  try {
     const uploaded = await storage.createFile(
       config.storageId,
       ID.unique(),
@@ -37,27 +35,46 @@ export const uploadFile = async (file: File, fileName: string) => {
         id: fileId,
         fileName: fileName,
         fileURL,
-        timeStamp: uploaded.$createdAt
+        timeStamp: uploaded.$createdAt,
       }
     );
 
-    return {success: true, response};
-  }catch(err){
-    console.error("File Upload Error: "+err);
-    return {success: false, error: `File Upload Error: ${err}`};
+    return { success: true, response };
+  } catch (err) {
+    console.error("File Upload Error: " + err);
+    return { success: false, error: `File Upload Error: ${err}` };
   }
 };
 
-export const fetchFiles = async () =>{
-  try{
+export const fetchFiles = async () => {
+  try {
     const response = await databases.listDocuments(
       config.databaseId,
       config.uploadedFilesCollectionId
     );
 
     console.log(response);
-    return {success: true, data: response.documents};
-  }catch(err){
-    return {success: false, error: `File Fetch Error: ${err}`}
+    return { success: true, data: response.documents };
+  } catch (err) {
+    return { success: false, error: `File Fetch Error: ${err}` };
   }
-}
+};
+
+export const deleteFile = async (documentId: string, fileId: string) => {
+  try {
+    await storage.deleteFile(
+      config.storageId, 
+      fileId
+    );
+
+    await databases.deleteDocument(
+      config.databaseId,
+      config.uploadedFilesCollectionId,
+      documentId
+    );
+
+    return { success: true };
+  } catch (err) {
+    return { success: false, error: `File Fetch Error: ${err}` };
+  }
+};

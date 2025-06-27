@@ -1,8 +1,8 @@
 'use client';
 
-import { Download, Share2, Eye } from 'lucide-react';
+import { Download, Share2, Eye, Delete, DeleteIcon, Trash } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { fetchFiles } from '../appwrite/config';
+import { deleteFile, fetchFiles } from '../appwrite/config';
 
 const demoFiles = [
   {
@@ -24,10 +24,12 @@ const demoFiles = [
 
 type UploadedFile = {
   $id: string;
+  id: string;
   fileName: string;
   fileURL: string;
   timeStamp: string;
 };
+
 
 export default function ViewFiles() {
   const [files, setFiles] = useState<UploadedFile[]>([]);
@@ -37,7 +39,14 @@ export default function ViewFiles() {
       const res = await fetchFiles();
 
       if (res.success && res.data) {
-        setFiles(res.data.map(({ $id, fileName, fileURL, timeStamp }) => ({ $id, fileName, fileURL, timeStamp })).reverse());
+        setFiles(res.data.map(({ $id, id, fileName, fileURL, timeStamp }) => ({
+          $id,
+          id,
+          fileName,
+          fileURL,
+          timeStamp,
+        })).reverse());
+
       } else {
         console.error(res.error);
       }
@@ -45,6 +54,16 @@ export default function ViewFiles() {
 
     getFiles();
   }, []);
+
+  const delete_file = async (documentId: string, fileId: string) => {
+    const res = await deleteFile(documentId, fileId); // Pass both
+    if (!res.success) {
+      alert(res.error);
+    } else {
+      setFiles((prev) => prev.filter((file) => file.$id !== documentId));
+    }
+  };
+
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-white to-blue-100 py-10 px-4">
@@ -69,16 +88,7 @@ export default function ViewFiles() {
                 >
                   <Eye className="w-5 h-5" />
                 </a>
-                <button
-                  onClick={() => {
-                    navigator.clipboard.writeText(file.fileURL);
-                    alert('Link copied to clipboard!');
-                  }}
-                  title="Share"
-                  className="hover:text-blue-800"
-                >
-                  <Share2 className="w-5 h-5" />
-                </button>
+
                 <a
                   href={file.fileURL}
                   download
@@ -87,6 +97,14 @@ export default function ViewFiles() {
                 >
                   <Download className="w-5 h-5" />
                 </a>
+
+                <button
+                  onClick={() => delete_file(file.$id, file.id)}
+                  title="Share"
+                  className="hover:text-blue-800"
+                >
+                  <Trash className="w-5 h-5 text-red-500" />
+                </button>
               </div>
             </div>
           ))}
