@@ -76,7 +76,7 @@ export default function ViewFiles() {
           {files.map((file) => (
             <div key={file.$id} className="bg-white shadow-md rounded-lg px-4 py-3 flex justify-between items-center hover:shadow-lg transition">
 
-              <span className="font-medium text-gray-800">{file.fileName}</span>
+              <span className="font-medium text-gray-800 text-wrap">{file.fileName}</span>
 
               <div className="flex gap-4 items-center text-blue-600">
                 <a
