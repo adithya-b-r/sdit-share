@@ -1,26 +1,9 @@
 'use client';
 
-import { Download, Share2, Eye, Delete, DeleteIcon, Trash } from 'lucide-react';
+import { Download, Eye, Trash } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { deleteFile, fetchFiles } from '../appwrite/config';
-
-const demoFiles = [
-  {
-    id: 1,
-    name: 'Assignment1.pdf',
-    url: 'https://example.com/file1.pdf',
-  },
-  {
-    id: 2,
-    name: 'Notes_JS_Basics.pdf',
-    url: 'https://example.com/file2.pdf',
-  },
-  {
-    id: 3,
-    name: 'Project_Code.zip',
-    url: 'https://example.com/file3.zip',
-  },
-];
+import { toast, ToastContainer } from 'react-toastify';
 
 type UploadedFile = {
   $id: string;
@@ -53,20 +36,22 @@ export default function ViewFiles() {
     }
 
     getFiles();
-  }, []);
+  }, [files]);
 
   const delete_file = async (documentId: string, fileId: string) => {
-    const res = await deleteFile(documentId, fileId); // Pass both
+    const res = await deleteFile(documentId, fileId);
     if (!res.success) {
-      alert(res.error);
+      toast.warn(res.error);
     } else {
       setFiles((prev) => prev.filter((file) => file.$id !== documentId));
+      toast.success("Deleted Successfully!");
     }
   };
 
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-white to-blue-100 py-10 px-4">
+      <ToastContainer />
       <div className="max-w-3xl mx-auto">
         <h1 className="text-3xl font-bold text-blue-800 mb-6 text-center">
           📂 Uploaded Files
@@ -76,7 +61,7 @@ export default function ViewFiles() {
           {files.map((file) => (
             <div key={file.$id} className="bg-white shadow-md rounded-lg px-4 py-3 flex justify-between items-center hover:shadow-lg transition">
 
-              <span className="font-medium text-gray-800">{file.fileName}</span>
+              <span className="font-medium text-gray-800 text-wrap break-all">{file.fileName}</span>
 
               <div className="flex gap-4 items-center text-blue-600">
                 <a
