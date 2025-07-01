@@ -1,4 +1,4 @@
-import { Client, Databases, Storage, ID } from "appwrite";
+import { Client, Databases, Storage, ID, Query } from "appwrite";
 
 export const config = {
   endpoint: process.env.NEXT_PUBLIC_APPWRITE_ENDPOINT!,
@@ -11,13 +11,28 @@ export const config = {
 
 const client = new Client();
 
-client.setEndpoint(config.endpoint).setProject(config.projectId);
+client
+ .setEndpoint(config.endpoint)
+ .setProject(config.projectId);
 
 const databases = new Databases(client);
 const storage = new Storage(client);
 
 export const uploadFile = async (file: File, fileName: string) => {
   try {
+    const existingFiles = await databases.listDocuments(
+      config.databaseId,
+      config.uploadedFilesCollectionId,
+      [Query.equal("fileName", fileName)]
+    );
+
+    if (existingFiles.documents.length > 0) {
+      return {
+        success: false,
+        error: `A file with the name "${fileName}" already exists. Please choose a different name or delete the existing file first.`,
+      };
+    }
+
     const uploaded = await storage.createFile(
       config.storageId,
       ID.unique(),
@@ -62,10 +77,7 @@ export const fetchFiles = async () => {
 
 export const deleteFile = async (documentId: string, fileId: string) => {
   try {
-    await storage.deleteFile(
-      config.storageId, 
-      fileId
-    );
+    await storage.deleteFile(config.storageId, fileId);
 
     await databases.deleteDocument(
       config.databaseId,
@@ -75,6 +87,24 @@ export const deleteFile = async (documentId: string, fileId: string) => {
 
     return { success: true };
   } catch (err) {
-    return { success: false, error: `File Fetch Error: ${err}` };
+    return { success: false, error: `File Delete Error: ${err}` };
+  }
+};
+
+export const checkFileNameExists = async (fileName: string) => {
+  try {
+    const existingFiles = await databases.listDocuments(
+      config.databaseId,
+      config.uploadedFilesCollectionId,
+      [Query.equal("fileName", fileName)]
+    );
+
+    return {
+      success: true,
+      exists: existingFiles.documents.length > 0,
+      count: existingFiles.documents.length,
+    };
+  } catch (err) {
+    return { success: false, error: `Check Error: ${err}` };
   }
 };
