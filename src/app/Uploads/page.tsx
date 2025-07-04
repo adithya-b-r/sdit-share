@@ -36,7 +36,7 @@ export default function ViewFiles() {
     }
 
     getFiles();
-  }, [files]);
+  }, []);
 
   const delete_file = async (documentId: string, fileId: string) => {
     const res = await deleteFile(documentId, fileId);
