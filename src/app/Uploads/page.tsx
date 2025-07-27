@@ -16,7 +16,7 @@ type UploadedFile = {
 
 export default function ViewFiles() {
   const [files, setFiles] = useState<UploadedFile[]>([]);
-  const visibility = false;
+  const visibility = true;
 
   useEffect(() => {
     const getFiles = async () => {
