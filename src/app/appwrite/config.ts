@@ -68,7 +68,7 @@ export const fetchFiles = async () => {
       config.uploadedFilesCollectionId
     );
 
-    console.log(response);
+    // console.log(response);
     return { success: true, data: response.documents };
   } catch (err) {
     return { success: false, error: `File Fetch Error: ${err}` };
