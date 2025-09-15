@@ -2,6 +2,9 @@ import { Download, Eye, Trash } from 'lucide-react';
 import { fetchFiles } from '../appwrite/config';
 import FileActions from '../Uploads/FileActions';
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 type UploadedFile = {
   $id: string;
   id: string;
