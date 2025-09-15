@@ -17,7 +17,7 @@ export default function FileActions({ documentId, fileId }: FileActionsProps) {
     const date = new Date();
     const pass = date.getHours() * date.getMinutes();
 
-    console.log(pass);
+    //console.log(pass);
 
     const upass = Number(prompt("Password: "));
 
