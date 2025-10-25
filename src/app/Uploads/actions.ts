@@ -11,9 +11,9 @@ export async function deleteFileAction(formData: FormData) {
   const date = new Date();
   const correctPassword = date.getHours() * date.getMinutes();
 
-  if (userPassword !== correctPassword) {
+  //if (userPassword !== correctPassword) {
     return { success: false, error: 'Invalid password!' };
-  }
+  //}
 
   try {
     const res = await deleteFile(documentId, fileId);
