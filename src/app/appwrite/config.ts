@@ -29,20 +29,30 @@ const getServerServices = () => {
 };
 
 // For client-side usage - reuses the same client and services
-let clientServices: { client: Client; databases: Databases; storage: Storage } | null = null;
+let cachedClientServices: { client: Client; databases: Databases; storage: Storage } | null = null;
 const getClientServices = () => {
-  if (!clientServices) {
+  if (!cachedClientServices) {
     const client = createClient();
-    clientServices = {
+    cachedClientServices = {
       client,
       databases: new Databases(client),
       storage: new Storage(client),
     };
   }
-  return clientServices;
+  return cachedClientServices;
 };
 
-// Get appropriate services based on environment
+/**
+ * Get Appwrite services (client, databases, storage) based on the current environment.
+ * 
+ * On the client-side (browser): Returns cached service instances for better performance
+ * and to maintain session state in localStorage.
+ * 
+ * On the server-side (Node.js): Creates new service instances for each request to avoid
+ * state pollution and memory leaks, and to prevent localStorage access errors during SSR.
+ * 
+ * @returns An object containing client, databases, and storage instances
+ */
 const getServices = () => {
   return typeof window !== 'undefined' ? getClientServices() : getServerServices();
 };
