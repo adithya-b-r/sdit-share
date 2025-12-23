@@ -4,9 +4,7 @@ const nextConfig: NextConfig = {
   eslint: {
     ignoreDuringBuilds: true,
   },
-  experimental: {
-    serverComponentsExternalPackages: ['appwrite']
-  },
+  serverExternalPackages: ['appwrite'],
   async headers() {
     return [
       {

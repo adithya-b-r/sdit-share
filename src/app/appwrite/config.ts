@@ -9,17 +9,40 @@ export const config = {
     process.env.NEXT_PUBLIC_APPWRITE_UPLOADED_FILES_COLLECTION_ID!,
 };
 
-const client = new Client();
+// Create client instance with conditional initialization
+const createClient = () => {
+  const client = new Client();
+  client
+    .setEndpoint(config.endpoint)
+    .setProject(config.projectId);
+  return client;
+};
 
-client
- .setEndpoint(config.endpoint)
- .setProject(config.projectId);
+// For server-side usage - creates a new client each time
+const getServerClient = () => {
+  return createClient();
+};
 
-const databases = new Databases(client);
-const storage = new Storage(client);
+// For client-side usage - reuses the same client
+let clientInstance: Client | null = null;
+const getClientClient = () => {
+  if (!clientInstance) {
+    clientInstance = createClient();
+  }
+  return clientInstance;
+};
+
+// Get appropriate client based on environment
+const getClient = () => {
+  return typeof window !== 'undefined' ? getClientClient() : getServerClient();
+};
 
 export const uploadFile = async (file: File, fileName: string) => {
   try {
+    const client = getClient();
+    const databases = new Databases(client);
+    const storage = new Storage(client);
+    
     const existingFiles = await databases.listDocuments(
       config.databaseId,
       config.uploadedFilesCollectionId,
@@ -63,6 +86,9 @@ export const uploadFile = async (file: File, fileName: string) => {
 
 export const fetchFiles = async () => {
   try {
+    const client = getClient();
+    const databases = new Databases(client);
+    
     const response = await databases.listDocuments(
       config.databaseId,
       config.uploadedFilesCollectionId
@@ -77,6 +103,10 @@ export const fetchFiles = async () => {
 
 export const deleteFile = async (documentId: string, fileId: string) => {
   try {
+    const client = getClient();
+    const databases = new Databases(client);
+    const storage = new Storage(client);
+    
     await storage.deleteFile(config.storageId, fileId);
 
     await databases.deleteDocument(
@@ -93,6 +123,9 @@ export const deleteFile = async (documentId: string, fileId: string) => {
 
 export const checkFileNameExists = async (fileName: string) => {
   try {
+    const client = getClient();
+    const databases = new Databases(client);
+    
     const existingFiles = await databases.listDocuments(
       config.databaseId,
       config.uploadedFilesCollectionId,
