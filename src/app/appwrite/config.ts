@@ -18,30 +18,38 @@ const createClient = () => {
   return client;
 };
 
-// For server-side usage - creates a new client each time
-const getServerClient = () => {
-  return createClient();
+// For server-side usage - creates a new client each time with its services
+const getServerServices = () => {
+  const client = createClient();
+  return {
+    client,
+    databases: new Databases(client),
+    storage: new Storage(client),
+  };
 };
 
-// For client-side usage - reuses the same client
-let clientInstance: Client | null = null;
-const getClientClient = () => {
-  if (!clientInstance) {
-    clientInstance = createClient();
+// For client-side usage - reuses the same client and services
+let clientServices: { client: Client; databases: Databases; storage: Storage } | null = null;
+const getClientServices = () => {
+  if (!clientServices) {
+    const client = createClient();
+    clientServices = {
+      client,
+      databases: new Databases(client),
+      storage: new Storage(client),
+    };
   }
-  return clientInstance;
+  return clientServices;
 };
 
-// Get appropriate client based on environment
-const getClient = () => {
-  return typeof window !== 'undefined' ? getClientClient() : getServerClient();
+// Get appropriate services based on environment
+const getServices = () => {
+  return typeof window !== 'undefined' ? getClientServices() : getServerServices();
 };
 
 export const uploadFile = async (file: File, fileName: string) => {
   try {
-    const client = getClient();
-    const databases = new Databases(client);
-    const storage = new Storage(client);
+    const { databases, storage } = getServices();
     
     const existingFiles = await databases.listDocuments(
       config.databaseId,
@@ -86,8 +94,7 @@ export const uploadFile = async (file: File, fileName: string) => {
 
 export const fetchFiles = async () => {
   try {
-    const client = getClient();
-    const databases = new Databases(client);
+    const { databases } = getServices();
     
     const response = await databases.listDocuments(
       config.databaseId,
@@ -103,9 +110,7 @@ export const fetchFiles = async () => {
 
 export const deleteFile = async (documentId: string, fileId: string) => {
   try {
-    const client = getClient();
-    const databases = new Databases(client);
-    const storage = new Storage(client);
+    const { databases, storage } = getServices();
     
     await storage.deleteFile(config.storageId, fileId);
 
@@ -123,8 +128,7 @@ export const deleteFile = async (documentId: string, fileId: string) => {
 
 export const checkFileNameExists = async (fileName: string) => {
   try {
-    const client = getClient();
-    const databases = new Databases(client);
+    const { databases } = getServices();
     
     const existingFiles = await databases.listDocuments(
       config.databaseId,
