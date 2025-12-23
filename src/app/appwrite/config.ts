@@ -9,17 +9,58 @@ export const config = {
     process.env.NEXT_PUBLIC_APPWRITE_UPLOADED_FILES_COLLECTION_ID!,
 };
 
-const client = new Client();
+// Create client instance with conditional initialization
+const createClient = () => {
+  const client = new Client();
+  client
+    .setEndpoint(config.endpoint)
+    .setProject(config.projectId);
+  return client;
+};
 
-client
- .setEndpoint(config.endpoint)
- .setProject(config.projectId);
+// For server-side usage - creates a new client each time with its services
+const getServerServices = () => {
+  const client = createClient();
+  return {
+    client,
+    databases: new Databases(client),
+    storage: new Storage(client),
+  };
+};
 
-const databases = new Databases(client);
-const storage = new Storage(client);
+// For client-side usage - reuses the same client and services
+let cachedClientServices: { client: Client; databases: Databases; storage: Storage } | null = null;
+const getClientServices = () => {
+  if (!cachedClientServices) {
+    const client = createClient();
+    cachedClientServices = {
+      client,
+      databases: new Databases(client),
+      storage: new Storage(client),
+    };
+  }
+  return cachedClientServices;
+};
+
+/**
+ * Get Appwrite services (client, databases, storage) based on the current environment.
+ * 
+ * On the client-side (browser): Returns cached service instances for better performance
+ * and to maintain session state in localStorage.
+ * 
+ * On the server-side (Node.js): Creates new service instances for each request to avoid
+ * state pollution and memory leaks, and to prevent localStorage access errors during SSR.
+ * 
+ * @returns An object containing client, databases, and storage instances
+ */
+const getServices = () => {
+  return typeof window !== 'undefined' ? getClientServices() : getServerServices();
+};
 
 export const uploadFile = async (file: File, fileName: string) => {
   try {
+    const { databases, storage } = getServices();
+    
     const existingFiles = await databases.listDocuments(
       config.databaseId,
       config.uploadedFilesCollectionId,
@@ -63,6 +104,8 @@ export const uploadFile = async (file: File, fileName: string) => {
 
 export const fetchFiles = async () => {
   try {
+    const { databases } = getServices();
+    
     const response = await databases.listDocuments(
       config.databaseId,
       config.uploadedFilesCollectionId
@@ -77,6 +120,8 @@ export const fetchFiles = async () => {
 
 export const deleteFile = async (documentId: string, fileId: string) => {
   try {
+    const { databases, storage } = getServices();
+    
     await storage.deleteFile(config.storageId, fileId);
 
     await databases.deleteDocument(
@@ -93,6 +138,8 @@ export const deleteFile = async (documentId: string, fileId: string) => {
 
 export const checkFileNameExists = async (fileName: string) => {
   try {
+    const { databases } = getServices();
+    
     const existingFiles = await databases.listDocuments(
       config.databaseId,
       config.uploadedFilesCollectionId,
