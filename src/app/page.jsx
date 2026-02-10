@@ -6,13 +6,13 @@ import { uploadFile } from './appwrite/config';
 import { toast, ToastContainer } from 'react-toastify';
 
 export default function Home() {
-  const [file, setFile] = useState<File | null>(null);
-  const [customName, setCustomName] = useState<string>('');
-  const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const [file, setFile] = useState(null);
+  const [customName, setCustomName] = useState('');
+  const fileInputRef = useRef(null);
 
   const [uploading, setUploading] = useState(false);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e) => {
     const selectedFile = e.target.files?.[0];
     if (selectedFile && selectedFile.size <= 50 * 1024 * 1024) {
       setFile(selectedFile);
@@ -57,7 +57,7 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-100 to-blue-300 flex flex-col items-center relative">
-      <ToastContainer position='top-center'/>
+      <ToastContainer position='top-center' />
       <div className="bg-white md:w-full max-w-xl w-[94%] my-auto rounded-2xl shadow-xl p-8 flex flex-col items-center gap-6">
         <div className="text-center">
           <h1 className="text-4xl font-extrabold text-blue-800">SDIT SHARE</h1>

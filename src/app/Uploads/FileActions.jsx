@@ -5,12 +5,7 @@ import { useRouter } from 'next/navigation';
 import { deleteFile } from '../appwrite/config';
 import { toast, ToastContainer } from 'react-toastify';
 
-interface FileActionsProps {
-  documentId: string;
-  fileId: string;
-}
-
-export default function FileActions({ documentId, fileId }: FileActionsProps) {
+export default function FileActions({ documentId, fileId }) {
   const router = useRouter();
 
   const delete_file = async () => {
@@ -28,7 +23,7 @@ export default function FileActions({ documentId, fileId }: FileActionsProps) {
           toast.warn(res.error);
         } else {
           toast.success("Deleted Successfully!");
-          
+
           setTimeout(() => {
             router.refresh();
           }, 500);

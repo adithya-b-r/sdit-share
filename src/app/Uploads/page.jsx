@@ -1,22 +1,14 @@
-import { Download, Eye, Trash } from 'lucide-react';
+import { Download, Eye } from 'lucide-react';
 import { fetchFiles } from '../appwrite/config';
 import FileActions from '../Uploads/FileActions';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
-type UploadedFile = {
-  $id: string;
-  id: string;
-  fileName: string;
-  fileURL: string;
-  timeStamp: string;
-};
-
 export default async function ViewFiles() {
   const visibility = true;
-  let files: UploadedFile[] = [];
-  let error: string | null = null;
+  let files = [];
+  let error = null;
 
   try {
     const res = await fetchFiles();
@@ -50,7 +42,7 @@ export default async function ViewFiles() {
                 Error: {error}
               </div>
             )}
-            
+
             <div className="flex flex-col gap-4">
               {files.map((file) => (
                 <div key={file.$id} className="bg-white shadow-md rounded-lg px-4 py-3 flex justify-between items-center hover:shadow-lg transition">
@@ -82,7 +74,7 @@ export default async function ViewFiles() {
                   </div>
                 </div>
               ))}
-              
+
               {files.length === 0 && !error && (
                 <div className="text-center text-gray-500 py-8">
                   No files uploaded yet.

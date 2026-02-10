@@ -3,9 +3,9 @@
 import { revalidatePath } from 'next/cache';
 import { deleteFile } from '../appwrite/config';
 
-export async function deleteFileAction(formData: FormData) {
-  const documentId = formData.get('documentId') as string;
-  const fileId = formData.get('fileId') as string;
+export async function deleteFileAction(formData) {
+  const documentId = formData.get('documentId');
+  const fileId = formData.get('fileId');
   const userPassword = Number(formData.get('password'));
 
   const date = new Date();

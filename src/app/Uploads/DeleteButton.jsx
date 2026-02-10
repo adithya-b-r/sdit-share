@@ -5,12 +5,7 @@ import { useTransition } from 'react';
 import { deleteFileAction } from './actions';
 import { toast } from 'react-toastify';
 
-interface DeleteButtonProps {
-  documentId: string;
-  fileId: string;
-}
-
-export default function DeleteButton({ documentId, fileId }: DeleteButtonProps) {
+export default function DeleteButton({ documentId, fileId }) {
   const [isPending, startTransition] = useTransition();
 
   const handleDelete = () => {
