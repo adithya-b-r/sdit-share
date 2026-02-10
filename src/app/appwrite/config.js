@@ -6,43 +6,20 @@ export const config = {
   databaseId: process.env.NEXT_PUBLIC_APPWRITE_DATABASE_ID,
   storageId: process.env.NEXT_PUBLIC_APPWRITE_STORAGE_ID,
   uploadedFilesCollectionId:
-    process.env.NEXT_PUBLIC_APPWRITE_UPLOADED_FILES_COLLECTION_ID,
+    process.env.NEXT_PUBLIC_APPWRITE_UPLOADED_FILES_COLLECTION_ID!,
 };
 
-// Polyfill localStorage for SSR/Node environment
-if (typeof window === 'undefined') {
-  if (!global.localStorage || typeof global.localStorage.getItem !== 'function') {
-    global.localStorage = {
-      getItem: (key) => null,
-      setItem: (key, value) => { },
-      removeItem: (key) => { },
-      clear: () => { },
-      length: 0,
-      key: (index) => null,
-    };
-  }
-}
+const client = new Client();
 
-// Helper to get Appwrite client instance securely
-const getClient = () => {
-  const client = new Client();
+client
+ .setEndpoint(config.endpoint)
+ .setProject(config.projectId);
 
-  client
-    .setEndpoint(config.endpoint)
-    .setProject(config.projectId);
-
-  return client;
-};
-
-// Initialize services lazily
-const getDatabases = () => new Databases(getClient());
-const getStorage = () => new Storage(getClient());
+const databases = new Databases(client);
+const storage = new Storage(client);
 
 export const uploadFile = async (file, fileName) => {
   try {
-    const databases = getDatabases();
-    const storage = getStorage();
-
     const existingFiles = await databases.listDocuments(
       config.databaseId,
       config.uploadedFilesCollectionId,
@@ -86,7 +63,6 @@ export const uploadFile = async (file, fileName) => {
 
 export const fetchFiles = async () => {
   try {
-    const databases = getDatabases();
     const response = await databases.listDocuments(
       config.databaseId,
       config.uploadedFilesCollectionId
@@ -101,9 +77,6 @@ export const fetchFiles = async () => {
 
 export const deleteFile = async (documentId, fileId) => {
   try {
-    const storage = getStorage();
-    const databases = getDatabases();
-
     await storage.deleteFile(config.storageId, fileId);
 
     await databases.deleteDocument(
@@ -120,7 +93,6 @@ export const deleteFile = async (documentId, fileId) => {
 
 export const checkFileNameExists = async (fileName) => {
   try {
-    const databases = getDatabases();
     const existingFiles = await databases.listDocuments(
       config.databaseId,
       config.uploadedFilesCollectionId,
