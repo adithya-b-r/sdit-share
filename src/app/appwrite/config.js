@@ -5,15 +5,14 @@ export const config = {
   projectId: process.env.NEXT_PUBLIC_APPWRITE_PROJECT_ID,
   databaseId: process.env.NEXT_PUBLIC_APPWRITE_DATABASE_ID,
   storageId: process.env.NEXT_PUBLIC_APPWRITE_STORAGE_ID,
-  uploadedFilesCollectionId:
-    process.env.NEXT_PUBLIC_APPWRITE_UPLOADED_FILES_COLLECTION_ID!,
+  uploadedFilesCollectionId: process.env.NEXT_PUBLIC_APPWRITE_UPLOADED_FILES_COLLECTION_ID,
 };
 
 const client = new Client();
 
 client
- .setEndpoint(config.endpoint)
- .setProject(config.projectId);
+  .setEndpoint(config.endpoint)
+  .setProject(config.projectId);
 
 const databases = new Databases(client);
 const storage = new Storage(client);
