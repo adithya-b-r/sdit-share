@@ -8,6 +8,20 @@ export const config = {
   uploadedFilesCollectionId: process.env.NEXT_PUBLIC_APPWRITE_UPLOADED_FILES_COLLECTION_ID,
 };
 
+
+// POLYFILL: Fix for "TypeError: localStorage.getItem is not a function" in Next.js SSR
+// Some environments define localStorage but miss getItem, causing Appwrite SDK to crash.
+if (typeof localStorage !== 'undefined' && typeof localStorage.getItem !== 'function') {
+  global.localStorage = {
+    getItem: () => null,
+    setItem: () => { },
+    removeItem: () => { },
+    clear: () => { },
+    length: 0,
+    key: () => null,
+  };
+}
+
 const client = new Client();
 
 client
