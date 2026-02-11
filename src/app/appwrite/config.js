@@ -31,7 +31,7 @@ client
 const databases = new Databases(client);
 const storage = new Storage(client);
 
-export const uploadFile = async (file, fileName) => {
+export const uploadFile = async (file, fileName, onProgress) => {
   try {
     const existingFiles = await databases.listDocuments(
       config.databaseId,
@@ -49,7 +49,13 @@ export const uploadFile = async (file, fileName) => {
     const uploaded = await storage.createFile(
       config.storageId,
       ID.unique(),
-      file
+      file,
+      [],
+      (progress) => {
+        if (onProgress) {
+          onProgress(progress);
+        }
+      }
     );
 
     const fileId = uploaded.$id;
