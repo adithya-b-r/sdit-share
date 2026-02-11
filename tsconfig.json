@@ -17,7 +17,7 @@
     "resolvePackageJsonImports": false,
     "resolvePackageJsonExports": false,
     "isolatedModules": true,
-    "jsx": "preserve",
+    "jsx": "react-jsx",
     "incremental": true,
     "plugins": [
       {
@@ -42,8 +42,9 @@
     "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx",
-    ".next/types/**/*.ts"
-, "src/app/appwrite/config.ts"  ],
+    ".next/types/**/*.ts",
+    "src/app/appwrite/config.ts"
+  ],
   "exclude": [
     "node_modules"
   ]
