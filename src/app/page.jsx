@@ -250,7 +250,7 @@ export default function Home() {
       <div className="relative z-10 min-h-screen flex flex-col items-center justify-center p-4 sm:p-6">
 
         {/* Main Card */}
-        <div className="w-full max-w-lg bg-violet-600/20 backdrop-blur-xl rounded-2xl border-2 border-inset border-blue-500 shadow-2xl shadow-black/30 p-8 flex flex-col gap-7">
+        <div className="w-full max-w-lg bg-violet-600/20 backdrop-blur-xl rounded-2xl border-2 border-inset border-blue-500 shadow-[0_0_40px_rgba(59,130,246,0.15)] p-8 flex flex-col gap-7 animate-in fade-in zoom-in-95 duration-700 ease-out">
 
           {/* Header */}
           <div className="text-center space-y-2">
@@ -298,8 +298,8 @@ export default function Home() {
                   flex flex-col items-center justify-center gap-5
                   transition-all duration-300 ease-in-out
                   ${isDragOver
-                  ? 'border-blue-400 bg-blue-500/15'
-                  : 'border-white/20 bg-white/5'
+                  ? 'border-blue-400 bg-blue-500/15 scale-[1.02] shadow-[0_0_20px_rgba(59,130,246,0.2)]'
+                  : 'border-white/20 bg-white/5 hover:border-blue-400/50 hover:bg-white/10'
                 }
               `}
             >
@@ -319,16 +319,16 @@ export default function Home() {
               <div className="flex items-center gap-3">
                 <button
                   onClick={() => fileInputRef.current?.click()}
-                  className="flex text-white items-center gap-2 px-4 py-2 text-sm font-semibold text-blue-400 bg-blue-500/15 border border-blue-500/30 rounded-lg hover:bg-blue-500/25 transition-all"
+                  className="flex text-white items-center gap-2 px-4 py-2 text-sm font-semibold text-blue-400 bg-blue-500/15 border border-blue-500/30 rounded-lg hover:bg-blue-500/30 hover:scale-105 hover:shadow-[0_0_15px_rgba(59,130,246,0.3)] transition-all duration-300 active:scale-95"
                 >
-                  <Files className="w-4 h-4" />
+                  <Files className="w-4 h-4 group-hover:animate-bounce" />
                   Choose Files
                 </button>
                 <button
                   onClick={() => folderInputRef.current?.click()}
-                  className="text-slate-200 flex items-center gap-2 px-4 py-2 text-sm font-semibold text-orange-400 bg-orange-500/15 border border-orange-500/30 rounded-lg hover:bg-orange-500/25 transition-all"
+                  className="text-slate-200 flex items-center gap-2 px-4 py-2 text-sm font-semibold text-orange-400 bg-orange-500/15 border border-orange-500/30 rounded-lg hover:bg-orange-500/30 hover:scale-105 hover:shadow-[0_0_15px_rgba(249,115,22,0.3)] transition-all duration-300 active:scale-95"
                 >
-                  <FolderUp className="w-4 h-4" />
+                  <FolderUp className="w-4 h-4 group-hover:animate-bounce" />
                   Choose Folder
                 </button>
               </div>
@@ -377,13 +377,13 @@ export default function Home() {
                 {files.map((entry) => (
                   <div
                     key={entry.id}
-                    className={`rounded-lg p-3 flex items-center gap-3 transition-all ${entry.status === 'done'
+                    className={`rounded-lg p-3 flex items-center gap-3 transition-all duration-300 animate-in fade-in slide-in-from-bottom-2 ${entry.status === 'done'
                       ? 'bg-emerald-500/10 border border-emerald-500/25'
                       : entry.status === 'error'
                         ? 'bg-red-500/10 border border-red-500/25'
                         : entry.status === 'uploading'
                           ? 'bg-blue-500/10 border border-blue-500/25'
-                          : 'bg-white/5 border border-white/10'
+                          : 'bg-white/5 border border-white/10 hover:bg-white/10'
                       }`}
                   >
                     {/* Status icon */}
@@ -471,10 +471,10 @@ export default function Home() {
                 className={`
                       w-full flex justify-center items-center gap-2 
                       font-semibold text-white py-3 rounded-xl
-                      transition-all duration-200 active:scale-[0.98]
+                      transition-all duration-300 active:scale-[0.98]
                       ${uploading || pendingCount === 0
                     ? 'bg-blue-500/20 cursor-not-allowed text-white/40'
-                    : 'bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-400 shadow-lg shadow-blue-500/30'
+                    : 'bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-400 shadow-[0_0_20px_rgba(59,130,246,0.4)] hover:shadow-[0_0_30px_rgba(59,130,246,0.6)] hover:scale-[1.02]'
                   }
                   `}
               >
@@ -498,7 +498,7 @@ export default function Home() {
               <div className="flex w-full items-center justify-center">
                 <a
                   href="/Uploads"
-                  className="w-full flex items-center justify-center text-sm font-semibold text-orange-400/80 hover:text-orange-300 flex items-center gap-2 py-2 px-4 rounded-lg hover:bg-orange-500/10 transition-colors"
+                  className="w-full flex items-center justify-center text-sm font-semibold text-orange-400/80 hover:text-orange-300 flex items-center gap-2 py-2 px-4 rounded-lg hover:bg-orange-500/15 transition-all duration-300 hover:scale-[1.02]"
                 >
                   <FolderOpen className="w-4 h-4" />
                   View All Files
