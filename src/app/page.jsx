@@ -6,6 +6,8 @@ import { uploadFile } from './appwrite/config';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import DarkVeil from '../components/DarkVeil';
+import { ThemeToggle } from '../components/ThemeToggle';
+import { useTheme } from 'next-themes';
 
 export default function Home() {
   // Each entry: { id, file, customName, status: 'pending' | 'uploading' | 'done' | 'error', errorMsg? }
@@ -13,6 +15,7 @@ export default function Home() {
   const fileInputRef = useRef(null);
   const folderInputRef = useRef(null);
   const idCounter = useRef(0);
+  const { theme } = useTheme();
 
   const [uploading, setUploading] = useState(false);
   const [isDragOver, setIsDragOver] = useState(false);
@@ -230,38 +233,48 @@ export default function Home() {
   const pendingCount = files.filter((f) => f.status === 'pending' || f.status === 'error').length;
 
   return (
-    <div className="min-h-screen relative overflow-hidden font-sans">
-      {/* DarkVeil Animated Background */}
-      <div className="absolute inset-0" style={{ width: '100%', height: '100%' }}>
-        <DarkVeil
-          hueShift={0}
-          noiseIntensity={0}
-          scanlineIntensity={0}
-          speed={0.5}
-          scanlineFrequency={0}
-          warpAmount={0}
-          resolutionScale={1}
-        />
+    <div className="min-h-screen relative overflow-hidden font-sans bg-slate-50 dark:bg-black transition-colors duration-500">
+      {/* Light Mode Gradient Fallback */}
+      <div className="absolute inset-0 bg-gradient-to-br from-blue-100 via-white to-purple-100 dark:opacity-0 transition-opacity duration-500 pointer-events-none" />
+
+      {/* DarkVeil Animated Background (Dark Mode Only) */}
+      <div className={`absolute inset-0 transition-opacity duration-500 ${theme === 'dark' ? 'opacity-100' : 'opacity-0 pointer-events-none'}`} style={{ width: '100%', height: '100%' }}>
+        {theme === 'dark' && (
+          <DarkVeil
+            hueShift={0}
+            noiseIntensity={0}
+            scanlineIntensity={0}
+            speed={0.5}
+            scanlineFrequency={0}
+            warpAmount={0}
+            resolutionScale={1}
+          />
+        )}
       </div>
 
-      <ToastContainer position='top-center' theme="colored" hideProgressBar autoClose={3000} />
+      <ToastContainer position='top-center' theme={theme === 'dark' ? 'dark' : 'light'} hideProgressBar autoClose={3000} />
 
       {/* Content */}
       <div className="relative z-10 min-h-screen flex flex-col items-center justify-center p-4 sm:p-6">
 
+        {/* Top Right Controls */}
+        <div className="absolute top-4 right-4 sm:top-6 sm:right-6">
+          <ThemeToggle />
+        </div>
+
         {/* Main Card */}
-        <div className="w-full max-w-lg bg-violet-600/20 backdrop-blur-xl rounded-2xl border-2 border-inset border-blue-500 shadow-[0_0_40px_rgba(59,130,246,0.15)] p-8 flex flex-col gap-7 animate-in fade-in zoom-in-95 duration-700 ease-out">
+        <div className="w-full max-w-lg bg-white/70 dark:bg-violet-600/20 backdrop-blur-xl rounded-2xl border-2 border-slate-200/50 dark:border-blue-500 shadow-xl dark:shadow-[0_0_40px_rgba(59,130,246,0.15)] p-8 flex flex-col gap-7 animate-in fade-in zoom-in-95 duration-700 ease-out transition-all">
 
           {/* Header */}
           <div className="text-center space-y-2">
-            <div className="inline-flex items-center gap-2 bg-orange-500/15 text-orange-400 text-xs font-bold uppercase tracking-widest px-3 py-1 rounded-full border border-orange-500/25 mb-2">
+            <div className="inline-flex items-center gap-2 bg-orange-100 dark:bg-orange-500/15 text-orange-600 dark:text-orange-400 text-xs font-bold uppercase tracking-widest px-3 py-1 rounded-full border border-orange-200 dark:border-orange-500/25 mb-2 transition-colors">
               <UploadCloud className="w-3 h-3" />
               Share Files
             </div>
-            <h1 className="text-2xl font-bold text-white tracking-tight">
+            <h1 className="text-2xl font-bold text-slate-800 dark:text-white tracking-tight transition-colors">
               Upload Files
             </h1>
-            <p className="text-white text-sm">
+            <p className="text-slate-500 dark:text-white/70 text-sm transition-colors">
               Upload files or entire folders to share. Max 3GB per file.
             </p>
           </div>
@@ -298,20 +311,20 @@ export default function Home() {
                   flex flex-col items-center justify-center gap-5
                   transition-all duration-300 ease-in-out
                   ${isDragOver
-                  ? 'border-blue-400 bg-blue-500/15 scale-[1.02] shadow-[0_0_20px_rgba(59,130,246,0.2)]'
-                  : 'border-white/20 bg-white/5 hover:border-blue-400/50 hover:bg-white/10'
+                  ? 'border-blue-500 bg-blue-50 dark:border-blue-400 dark:bg-blue-500/15 scale-[1.02] shadow-[0_0_20px_rgba(59,130,246,0.2)]'
+                  : 'border-slate-300 bg-slate-50/50 hover:border-blue-400 hover:bg-blue-50/30 dark:border-white/20 dark:bg-white/5 dark:hover:border-blue-400/50 dark:hover:bg-white/10'
                 }
               `}
             >
-              <div className={`p-3.5 rounded-full transition-all duration-300 ${isDragOver ? 'bg-blue-500/20 text-blue-400 scale-110' : 'bg-white/10 text-blue-400/80'}`}>
+              <div className={`p-3.5 rounded-full transition-all duration-300 ${isDragOver ? 'bg-blue-100 text-blue-600 dark:bg-blue-500/20 dark:text-blue-400 scale-110' : 'bg-slate-200 text-slate-500 dark:bg-white/10 dark:text-blue-400/80'}`}>
                 <UploadCloud className="w-7 h-7" />
               </div>
 
               <div className="text-center space-y-1">
-                <p className="text-sm font-semibold text-white/80">
+                <p className="text-sm font-semibold text-slate-700 dark:text-white/80 transition-colors">
                   Drag & drop files or folders here
                 </p>
-                <p className="text-xs text-white/30">
+                <p className="text-xs text-slate-500 dark:text-white/40 transition-colors">
                   Or use the buttons below to browse
                 </p>
               </div>
@@ -319,14 +332,14 @@ export default function Home() {
               <div className="flex items-center gap-3">
                 <button
                   onClick={() => fileInputRef.current?.click()}
-                  className="flex text-white items-center gap-2 px-4 py-2 text-sm font-semibold text-blue-400 bg-blue-500/15 border border-blue-500/30 rounded-lg hover:bg-blue-500/30 hover:scale-105 hover:shadow-[0_0_15px_rgba(59,130,246,0.3)] transition-all duration-300 active:scale-95"
+                  className="flex text-blue-600 dark:text-white items-center gap-2 px-4 py-2 text-sm font-semibold dark:text-blue-400 bg-blue-50 hover:bg-blue-100 border-blue-200 dark:bg-blue-500/15 border dark:border-blue-500/30 rounded-lg dark:hover:bg-blue-500/30 hover:scale-105 hover:shadow-[0_0_15px_rgba(59,130,246,0.3)] transition-all duration-300 active:scale-95"
                 >
                   <Files className="w-4 h-4 group-hover:animate-bounce" />
                   Choose Files
                 </button>
                 <button
                   onClick={() => folderInputRef.current?.click()}
-                  className="text-slate-200 flex items-center gap-2 px-4 py-2 text-sm font-semibold text-orange-400 bg-orange-500/15 border border-orange-500/30 rounded-lg hover:bg-orange-500/30 hover:scale-105 hover:shadow-[0_0_15px_rgba(249,115,22,0.3)] transition-all duration-300 active:scale-95"
+                  className="text-orange-600 flex items-center gap-2 px-4 py-2 text-sm font-semibold dark:text-orange-400 bg-orange-50 hover:bg-orange-100 border-orange-200 dark:bg-orange-500/15 border dark:border-orange-500/30 rounded-lg dark:hover:bg-orange-500/30 hover:scale-105 hover:shadow-[0_0_15px_rgba(249,115,22,0.3)] transition-all duration-300 active:scale-95"
                 >
                   <FolderUp className="w-4 h-4 group-hover:animate-bounce" />
                   Choose Folder
@@ -338,7 +351,7 @@ export default function Home() {
             <div className="space-y-3">
               {/* List header */}
               <div className="flex items-center justify-between">
-                <p className="text-xs font-semibold text-white/50 uppercase tracking-wide">
+                <p className="text-xs font-semibold text-slate-500 dark:text-white/50 uppercase tracking-wide transition-colors">
                   {files.length} file{files.length !== 1 ? 's' : ''} queued
                 </p>
                 <div className="flex items-center gap-2">
@@ -346,19 +359,19 @@ export default function Home() {
                     <>
                       <button
                         onClick={() => fileInputRef.current?.click()}
-                        className="text-xs font-medium text-blue-400 hover:text-blue-300 px-2 py-1 rounded hover:bg-blue-500/10 transition-colors"
+                        className="text-xs font-medium text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 px-2 py-1 rounded hover:bg-blue-100 dark:hover:bg-blue-500/10 transition-colors"
                       >
                         + Files
                       </button>
                       <button
                         onClick={() => folderInputRef.current?.click()}
-                        className="text-xs font-medium text-orange-400 hover:text-orange-300 px-2 py-1 rounded hover:bg-orange-500/10 transition-colors"
+                        className="text-xs font-medium text-orange-600 dark:text-orange-400 hover:text-orange-700 dark:hover:text-orange-300 px-2 py-1 rounded hover:bg-orange-100 dark:hover:bg-orange-500/10 transition-colors"
                       >
                         + Folder
                       </button>
                       <button
                         onClick={clearAll}
-                        className="text-xs font-medium text-red-400 hover:text-red-300 px-2 py-1 rounded hover:bg-red-500/10 transition-colors"
+                        className="text-xs font-medium text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 px-2 py-1 rounded hover:bg-red-100 dark:hover:bg-red-500/10 transition-colors"
                       >
                         Clear All
                       </button>
@@ -372,30 +385,30 @@ export default function Home() {
                 onDragOver={handleDragOver}
                 onDragLeave={handleDragLeave}
                 onDrop={handleDrop}
-                className={`max-h-64 overflow-y-auto space-y-2 rounded-xl p-1 transition-colors ${isDragOver ? 'bg-blue-500/10' : ''}`}
+                className={`max-h-64 overflow-y-auto space-y-2 rounded-xl p-1 transition-colors ${isDragOver ? 'bg-blue-50 dark:bg-blue-500/10' : ''}`}
               >
                 {files.map((entry) => (
                   <div
                     key={entry.id}
                     className={`rounded-lg p-3 flex items-center gap-3 transition-all duration-300 animate-in fade-in slide-in-from-bottom-2 ${entry.status === 'done'
-                      ? 'bg-emerald-500/10 border border-emerald-500/25'
+                      ? 'bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/25'
                       : entry.status === 'error'
-                        ? 'bg-red-500/10 border border-red-500/25'
+                        ? 'bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/25'
                         : entry.status === 'uploading'
-                          ? 'bg-blue-500/10 border border-blue-500/25'
-                          : 'bg-white/5 border border-white/10 hover:bg-white/10'
+                          ? 'bg-blue-50 dark:bg-blue-500/10 border border-blue-200 dark:border-blue-500/25'
+                          : 'bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 hover:bg-slate-100 dark:hover:bg-white/10'
                       }`}
                   >
                     {/* Status icon */}
                     <div className="flex-shrink-0">
                       {entry.status === 'uploading' ? (
-                        <Loader2 className="w-4 h-4 text-blue-400 animate-spin" />
+                        <Loader2 className="w-4 h-4 text-blue-500 dark:text-blue-400 animate-spin" />
                       ) : entry.status === 'done' ? (
-                        <Check className="w-4 h-4 text-emerald-400" />
+                        <Check className="w-4 h-4 text-emerald-500 dark:text-emerald-400" />
                       ) : entry.status === 'error' ? (
-                        <AlertCircle className="w-4 h-4 text-red-400" />
+                        <AlertCircle className="w-4 h-4 text-red-500 dark:text-red-400" />
                       ) : (
-                        <FileText className="w-4 h-4 text-yellow-400" />
+                        <FileText className="w-4 h-4 text-yellow-600 dark:text-yellow-400" />
                       )}
                     </div>
 
@@ -407,31 +420,31 @@ export default function Home() {
                             type="text"
                             value={entry.customName}
                             onChange={(e) => updateCustomName(entry.id, e.target.value)}
-                            className="flex-1 min-w-0 bg-transparent text-sm text-white border-b border-white/15 focus:border-blue-400 focus:outline-none py-0.5 transition-colors"
+                            className="flex-1 min-w-0 bg-transparent text-sm text-slate-800 dark:text-white border-b border-slate-300 dark:border-white/15 focus:border-blue-500 dark:focus:border-blue-400 focus:outline-none py-0.5 transition-colors"
                             placeholder="File name"
                           />
                         ) : (
-                          <p className="text-sm text-white truncate">{entry.customName}</p>
+                          <p className="text-sm text-slate-800 dark:text-white truncate transition-colors">{entry.customName}</p>
                         )}
                       </div>
                       <div className="flex items-center gap-2 mt-0.5">
-                        <p className="text-[10px] text-white/30 truncate" title={entry.file.name}>
+                        <p className="text-[10px] text-slate-500 dark:text-white/40 truncate transition-colors" title={entry.file.name}>
                           {entry.file.name}
                         </p>
-                        <span className="text-[10px] text-white/20">•</span>
-                        <p className="text-[10px] text-white/30 flex-shrink-0">
+                        <span className="text-[10px] text-slate-300 dark:text-white/20">•</span>
+                        <p className="text-[10px] text-slate-500 dark:text-white/40 flex-shrink-0 transition-colors">
                           {formatSize(entry.file.size)}
                         </p>
                       </div>
                       {entry.status === 'uploading' && (
                         <div className="mt-2 space-y-1">
-                          <div className="w-full bg-white/10 rounded-full h-1.5 overflow-hidden">
+                          <div className="w-full bg-slate-200 dark:bg-white/10 rounded-full h-1.5 overflow-hidden">
                             <div
-                              className="bg-blue-400 h-1.5 rounded-full transition-all duration-300 ease-out"
+                              className="bg-blue-500 dark:bg-blue-400 h-1.5 rounded-full transition-all duration-300 ease-out"
                               style={{ width: `${entry.progress}%` }}
                             />
                           </div>
-                          <div className="flex justify-between items-center text-[10px] text-white/50">
+                          <div className="flex justify-between items-center text-[10px] text-slate-500 dark:text-white/50">
                             <span>{Math.round(entry.progress)}%</span>
                             <span>
                               {formatSize(entry.uploadedSize || 0)} / {formatSize(entry.file.size)}
@@ -440,7 +453,7 @@ export default function Home() {
                         </div>
                       )}
                       {entry.status === 'error' && entry.errorMsg && (
-                        <p className="text-[10px] text-red-400 mt-0.5 truncate" title={entry.errorMsg}>
+                        <p className="text-[10px] text-red-500 dark:text-red-400 mt-0.5 truncate transition-colors" title={entry.errorMsg}>
                           {entry.errorMsg}
                         </p>
                       )}
@@ -450,7 +463,7 @@ export default function Home() {
                     {(entry.status === 'pending' || entry.status === 'error' || entry.status === 'done') && !uploading && (
                       <button
                         onClick={() => removeFile(entry.id)}
-                        className="flex-shrink-0 p-1 text-white/30 hover:text-red-400 hover:bg-red-500/10 rounded transition-colors"
+                        className="flex-shrink-0 p-1 text-slate-400 dark:text-white/30 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-100 dark:hover:bg-red-500/10 rounded transition-colors"
                         title="Remove"
                       >
                         <X className="w-3.5 h-3.5" />
@@ -473,8 +486,8 @@ export default function Home() {
                       font-semibold text-white py-3 rounded-xl
                       transition-all duration-300 active:scale-[0.98]
                       ${uploading || pendingCount === 0
-                    ? 'bg-blue-500/20 cursor-not-allowed text-white/40'
-                    : 'bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-400 shadow-[0_0_20px_rgba(59,130,246,0.4)] hover:shadow-[0_0_30px_rgba(59,130,246,0.6)] hover:scale-[1.02]'
+                    ? 'bg-slate-200 dark:bg-blue-500/20 cursor-not-allowed text-slate-400 dark:text-white/40'
+                    : 'bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-400 shadow-[0_0_15px_rgba(59,130,246,0.3)] dark:shadow-[0_0_20px_rgba(59,130,246,0.4)] hover:shadow-[0_0_25px_rgba(59,130,246,0.5)] hover:scale-[1.02]'
                   }
                   `}
               >
@@ -498,7 +511,7 @@ export default function Home() {
               <div className="flex w-full items-center justify-center">
                 <a
                   href="/Uploads"
-                  className="w-full flex items-center justify-center text-sm font-semibold text-orange-400/80 hover:text-orange-300 flex items-center gap-2 py-2 px-4 rounded-lg hover:bg-orange-500/15 transition-all duration-300 hover:scale-[1.02]"
+                  className="w-full flex items-center justify-center text-sm font-semibold text-orange-600 dark:text-orange-400/80 hover:text-orange-500 dark:hover:text-orange-300 flex items-center gap-2 py-2 px-4 rounded-lg hover:bg-orange-100 dark:hover:bg-orange-500/15 transition-all duration-300 hover:scale-[1.02]"
                 >
                   <FolderOpen className="w-4 h-4" />
                   View All Files
@@ -509,7 +522,7 @@ export default function Home() {
         </div>
 
         {/* Footer */}
-        <div className="absolute bottom-0 w-full mb-2 text-white text-sm font-medium text-center">
+        <div className="absolute bottom-0 w-full mb-2 text-slate-500 dark:text-white/60 text-sm font-medium text-center transition-colors">
           &copy; {new Date().getFullYear()} SDIT Share. Maximum file size: 3GB.
         </div>
       </div>

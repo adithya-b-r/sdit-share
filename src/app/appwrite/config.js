@@ -82,13 +82,30 @@ export const uploadFile = async (file, fileName, onProgress) => {
 
 export const fetchFiles = async () => {
   try {
-    const response = await databases.listDocuments(
-      config.databaseId,
-      config.uploadedFilesCollectionId
-    );
+    let allDocuments = [];
+    let offset = 0;
+    const limit = 100;
 
-    // console.log(response);
-    return { success: true, data: response.documents };
+    while (true) {
+      const response = await databases.listDocuments(
+        config.databaseId,
+        config.uploadedFilesCollectionId,
+        [
+          Query.limit(limit),
+          Query.offset(offset)
+        ]
+      );
+
+      allDocuments.push(...response.documents);
+
+      if (response.documents.length < limit) {
+        break;
+      }
+
+      offset += limit;
+    }
+
+    return { success: true, data: allDocuments };
   } catch (err) {
     return { success: false, error: `File Fetch Error: ${err}` };
   }
